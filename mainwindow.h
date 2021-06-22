@@ -24,12 +24,20 @@ private:
     void placeGameButtons(int height = 10, int width = 8);
     void clearGameButtons();
     QVector<QVector<QMineButton*>> gridVector;
+    unsigned int gridWidth;
+    unsigned int gridHeight;
+    unsigned long numMines;
     GameState game;
     QVector<QPixmap> gameIcons;
     void loadGameIcons();
 
+    void openTile(QMineButton *mb);
+    void openAdjacentTiles(QMineButton* centre);
+
 private slots:
-    void onMineRightReleased();
-    void onMineLeftReleased();
+    void onMineRightPressed();
+    void onMineLeftPressed();
+
+    void onRestartClicked();
 };
 #endif // MAINWINDOW_H
