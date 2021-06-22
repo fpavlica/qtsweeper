@@ -20,7 +20,6 @@ public:
 private:
     Ui::MainWindow *ui;
 
-
     void placeGameButtons(int height = 10, int width = 8);
     void clearGameButtons();
     QVector<QVector<QMineButton*>> gridVector;

@@ -71,7 +71,8 @@ char GameState::openSingleTile(unsigned int row, unsigned int col) {
     }
 }
 
-//maybe have this as a game state enum instead (won, lost, in_progress)
+//maybe have this as a game state enum instead? (won, lost, in_progress)
+//also, this does not account for if a tile has been opened twice in one game
 bool GameState::isGameWon() {
     return numOpened + numMines >= width * height;
 }
