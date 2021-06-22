@@ -56,7 +56,7 @@ void MainWindow::placeGameButtons(int height, int width) {
 
     //set up my holding vector. maybe move this elsewhere
     gridVector = QVector<QVector<QMineButton*>>(height);
-    gridHeight = height; //should want to get these from the gameState, or this->gridW/H
+    gridHeight = height;
     gridWidth = width;
     for (auto& row : gridVector){
         row = QVector<QMineButton*>(width);
