@@ -38,6 +38,7 @@ private slots:
 
     void onTileRevealed(int grid_row, int grid_col, int val);
     void onGameFinished(bool win);
+    void onFlagToggled(int grid_row, int grid_col, bool newState);
 
     void onRestartClicked();
 

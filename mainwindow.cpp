@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->bRestart, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
     connect(&game, &GameState::tileRevealed, this, &MainWindow::onTileRevealed);
     connect(&game, &GameState::gameFinished, this, &MainWindow::onGameFinished);
+    connect(&game, &GameState::flagToggled, this, &MainWindow::onFlagToggled);
 
 }
 
@@ -120,20 +121,12 @@ void MainWindow::onRestartClicked() {
 void MainWindow::onMineRightPressed() {
     QMineButton* mb = qobject_cast<QMineButton*>(sender());
     qDebug() << "right clicked: (" << mb->getRow() << ", " << mb->getCol() << ").";
+    game.toggleFlag(mb->getRow(), mb->getCol());
 
-    if (mb->isOpened())
-        return; //do not allow marking opened tiles
+}
 
-//    mb->setText(QString('x'));
-    if (mb->isFlagMarked()) {
-        //this should maybe be done in the accessor function instead.
-        mb->setFlagMarked(false);
-        mb->setIcon(gameIcons[10]);
-    }
-    else{
-        mb->setFlagMarked(true);
-        mb->setIcon(gameIcons[11]);
-    }
+void MainWindow::onFlagToggled(int grid_row, int grid_col, bool newState){
+    gridVector[grid_row][grid_col]->setIcon(gameIcons[newState == true? 11 : 10]);
 }
 
 void MainWindow::onMineLeftPressed() {

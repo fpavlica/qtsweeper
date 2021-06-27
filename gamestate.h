@@ -5,22 +5,32 @@
 //could also use a hash set of mine location indices if memory is a concern
 #include <vector>
 #include <QObject>
+#include <QVector>
 
 class GameState  : public QObject
 {
     Q_OBJECT
 
 public:
+    struct Tile {
+        bool containsMine = false;
+        bool opened = false;
+        bool flagMarked = false;
+    };
 
     void setUp(int height, int width, long numMines);
 
     void openTile(int row, int col);
 
     bool isGameWon();
+    bool toggleFlag(int row, int col); //returns true if newly flagged, false if newly unflagged
 
 private:
-    std::vector<std::vector<bool>> gameGrid;
-    std::vector<std::vector<bool>> openedGrid;
+//    std::vector<std::vector<bool>> mineGrid;
+//    std::vector<std::vector<bool>> openedGrid;
+
+//    std::vector<std::vector<Tile>> gameGrid;
+    QVector<QVector<Tile>> gameGrid;
 //    void placeMines(unsigned int height, unsigned int width, unsigned int numMines);
     long numOpened, numMines;
 
@@ -32,6 +42,7 @@ private:
 signals:
     void tileRevealed(int grid_row, int grid_col, char value);
     void gameFinished(bool win);
+    void flagToggled(int grid_row, int grid_col, bool newState);
 
 };
 
