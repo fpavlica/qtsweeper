@@ -40,6 +40,9 @@ void GameState::setUp(int height, int width, long numMines){
         std::sample(range.begin(), range.end(), std::back_inserter(indices), numMines,
                     std::mt19937{std::random_device{}()});
 
+        //uncomment to place all mines in the first n tiles, for testing
+//        std::iota(indices.begin(), indices.end(), 0);
+
         //converting from flat indices to placed mines on the game grid.
         for (const unsigned int& i: indices) {
             int row = i / width;
@@ -98,16 +101,17 @@ void GameState::openTile(int row, int col) {
         char mineCount = countNeighbours(row, col);
         emit tileRevealed(row, col, mineCount);
 
+        if (isGameWon()) {
+            emit gameFinished(true);
+        }
+
         //if mineCount is still 0, surrounding tiles should be opened too
         if (mineCount == 0) {
             //open surrounding tiles
             openSurrounding(row, col);
         }
 
-        if (isGameWon()) {
-            //TODO currently if this happens on a multi-opening, this signal gets emitted multiple times
-            emit gameFinished(true);
-        }
+
     }
 }
 
@@ -124,5 +128,5 @@ bool GameState::toggleFlag(int row, int col) {
 //maybe have this as a game state enum instead? (won, lost, in_progress)
 //also, this does not account for if a tile has been opened twice in one game
 bool GameState::isGameWon() {
-    return numOpened + numMines >= width * height;
+    return numOpened + numMines == width * height;
 }
