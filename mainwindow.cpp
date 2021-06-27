@@ -132,15 +132,12 @@ void MainWindow::onFlagToggled(int grid_row, int grid_col, bool newState){
 void MainWindow::onMineLeftPressed() {
     QMineButton* mb = qobject_cast<QMineButton*>(sender());
     qDebug() << "left clicked: (" << mb->getRow() << ", " << mb->getCol() << ").";
-    openTile(mb);
+    game.openTile(mb->getRow(), mb->getCol());
 }
 
 void MainWindow::onTileRevealed(int grid_row, int grid_col, int val) {
     auto * mb = gridVector.at(grid_row).at(grid_col);
     mb->setIcon(gameIcons[val]);
-
-
-    mb->setOpened(true);
 }
 
 void MainWindow::onGameFinished(bool win) {
@@ -150,23 +147,4 @@ void MainWindow::onGameFinished(bool win) {
     mbox.setText(win? "You win!" : "You lost");
     ui->wGameGrid->setEnabled(false);
     mbox.exec();
-}
-
-void MainWindow::openTile(QMineButton *mb) {
-    if(mb->isOpened())
-        return; //do not open what has already been opened
-    if (mb->isFlagMarked())
-        return; //do not open if marked.
-
-//    char tileval = game.openSingleTile(mb->getRow(), mb->getCol());
-    game.openTile(mb->getRow(), mb->getCol());
-//    qDebug() << "value: " << (int)tileval;
-//    char valchar = val0 + '0';
-
-//    mb->setText(QString(valchar));
-
-
-    //lock the board after a win or lose.
-
-
 }

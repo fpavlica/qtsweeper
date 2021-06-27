@@ -30,8 +30,6 @@ private:
     QVector<QPixmap> gameIcons;
     void loadGameIcons();
 
-    void openTile(QMineButton *mb);
-
 private slots:
     void onMineRightPressed();
     void onMineLeftPressed();
