@@ -3,15 +3,15 @@
 #include <random>
 //#include <iostream>
 
-GameState::GameState()
-{
-
-}
 
 //should probs move this into the constructor
-void GameState::setUp(unsigned int height, unsigned int width, unsigned long numMines){
+void GameState::setUp(int height, int width, long numMines){
     gameGrid = std::vector<std::vector<bool>>(height);
     for (auto& row : gameGrid){
+        row = std::vector<bool>(width, false);
+    }
+    openedGrid = std::vector<std::vector<bool>>(height);
+    for (auto& row : openedGrid){
         row = std::vector<bool>(width, false);
     }
 
@@ -35,39 +35,70 @@ void GameState::setUp(unsigned int height, unsigned int width, unsigned long num
 
         //converting from flat indices to placed mines on the game grid.
         for (const unsigned int& i: indices) {
-            unsigned int row = i / width;
-            unsigned int col = i % width;
+            int row = i / width;
+            int col = i % width;
 
             gameGrid[row][col] = true;
         }
     }
 }
 
-char GameState::openSingleTile(unsigned int row, unsigned int col) {
+char GameState::countNeighbours(int row, int col) {
+    char mineCount = 0;
+    for (int rowi = row - 1; rowi <= row + 1; ++rowi) {
+        if (rowi < 0 || rowi >= height) continue;
+
+        for (int coli = (int)col - 1; coli <= (int)col + 1; ++coli) {
+            if (coli < 0 || coli >= width) continue;
+
+            if (gameGrid.at(rowi).at(coli) == true) {
+                ++mineCount;
+            }
+        }
+    }
+    return mineCount;
+}
+
+void GameState::openSurrounding(int row, int col) {
+    for (int rowi = row - 1; rowi <= row + 1; ++rowi) {
+        if (rowi < 0 || rowi >= height) continue;
+
+        for (int coli = (int)col - 1; coli <= (int)col + 1; ++coli) {
+            if (coli < 0 || coli >= width) continue;
+            if (coli == col && rowi == row) continue; //skip the centre tile
+
+            openTile(rowi, coli);
+        }
+    }
+}
+
+void GameState::openTile(int row, int col) {
+    if (openedGrid.at(row).at(col))
+        return; //do not open again once opened
+
     //increment numOpened
     ++numOpened;
+    openedGrid.at(row).at(col) = true;
     //first explode if needed.
     if (gameGrid[row][col] == true) {
-        return 9;
+//        return 9;
+        emit tileRevealed(row, col, 9);
+        emit gameFinished(false);
     } else {
         //no mine on current tile
         //check surrounding tiles for number of mines
-        int mineCount = 0;
-        for (int rowi = (int)row - 1; rowi <= (int)row + 1; ++rowi) {
-            if (rowi < 0 || rowi >= gameGrid.size()) continue;
+        char mineCount = countNeighbours(row, col);
+        emit tileRevealed(row, col, mineCount);
 
-            for (int coli = (int)col - 1; coli <= (int)col + 1; ++coli) {
-                if (coli < 0 || coli >= gameGrid[rowi].size()) continue;
-
-//                std::cout << "checking rowi " << rowi << ", coli " <<coli <<std::endl;
-//                mineCount += gameGrid[rowi][coli]; //true is +1, false nothing
-                if (gameGrid[rowi][coli] == true) {
-                    ++mineCount;
-                }
-            }
-        }
         //if mineCount is still 0, surrounding tiles should be opened too
-        return mineCount;
+        if (mineCount == 0) {
+            //open surrounding tiles
+            openSurrounding(row, col);
+        }
+
+        if (isGameWon()) {
+            emit gameFinished(true);
+        }
     }
 }
 

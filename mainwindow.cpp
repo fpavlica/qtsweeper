@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
     game.setUp(height, width, numMines);
 
     connect(ui->bRestart, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
+    connect(&game, &GameState::tileRevealed, this, &MainWindow::onTileRevealed);
+    connect(&game, &GameState::gameFinished, this, &MainWindow::onGameFinished);
 
 }
 
@@ -140,57 +142,38 @@ void MainWindow::onMineLeftPressed() {
     openTile(mb);
 }
 
+void MainWindow::onTileRevealed(int grid_row, int grid_col, int val) {
+    auto * mb = gridVector.at(grid_row).at(grid_col);
+    mb->setIcon(gameIcons[val]);
+
+
+    mb->setOpened(true);
+}
+
+void MainWindow::onGameFinished(bool win) {
+    //win signal received <- all non-mine tiles opened
+    //lose signal received <- mine opened
+    QMessageBox mbox;
+    mbox.setText(win? "You win!" : "You lost");
+    ui->wGameGrid->setEnabled(false);
+    mbox.exec();
+}
+
 void MainWindow::openTile(QMineButton *mb) {
     if(mb->isOpened())
         return; //do not open what has already been opened
     if (mb->isFlagMarked())
         return; //do not open if marked.
 
-    char tileval = game.openSingleTile(mb->getRow(), mb->getCol());
-    qDebug() << "value: " << (int)tileval;
+//    char tileval = game.openSingleTile(mb->getRow(), mb->getCol());
+    game.openTile(mb->getRow(), mb->getCol());
+//    qDebug() << "value: " << (int)tileval;
 //    char valchar = val0 + '0';
 
 //    mb->setText(QString(valchar));
-    mb->setIcon(gameIcons[tileval]);
-    mb->setOpened(true);
-    if (tileval == 0) {
-        // open all adjacent tiles
-        openAdjacentTiles(mb);
-    } else if (tileval == 9) {
-        //mine opened
-        QMessageBox mbox;
-        mbox.setText("You lost");
-        ui->wGameGrid->setEnabled(false);
-        mbox.exec();
-    } else if (game.isGameWon()) {
-        //last tile opened
-        QMessageBox mbox;
-        mbox.setText("You win!");
-        ui->wGameGrid->setEnabled(false);
-        mbox.exec();
-    }
+
 
     //lock the board after a win or lose.
 
 
-}
-
-//recursively opens 8 adjacent tiles to centre.
-void MainWindow::openAdjacentTiles(QMineButton *centre) {
-    int row = centre->getRow();
-    int col = centre->getCol();
-
-    for (int rowi = (int)row - 1; rowi <= (int)row + 1; ++rowi) {
-        if (rowi < 0 || rowi >= (int)gridHeight) continue;
-
-        for (int coli = (int)col - 1; coli <= (int)col + 1; ++coli) {
-            if (coli < 0 || coli >= (int)gridWidth) continue;
-            if (rowi == row && coli == col) continue; //skip the centre tile
-
-            QMineButton* mb = gridVector[rowi][coli];
-            //clear flag mark if opening a 0-area
-            mb->setFlagMarked(false);
-            openTile(mb);
-        }
-    }
 }

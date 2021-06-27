@@ -31,12 +31,15 @@ private:
     void loadGameIcons();
 
     void openTile(QMineButton *mb);
-    void openAdjacentTiles(QMineButton* centre);
 
 private slots:
     void onMineRightPressed();
     void onMineLeftPressed();
 
+    void onTileRevealed(int grid_row, int grid_col, int val);
+    void onGameFinished(bool win);
+
     void onRestartClicked();
+
 };
 #endif // MAINWINDOW_H
