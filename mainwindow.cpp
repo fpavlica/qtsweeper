@@ -11,10 +11,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     loadGameIcons();
-    int width = 9, height = 9;
+    int width = 8, height = 10;
     this->numMines = 10;
 
-    //todo I'm not a fan of how these are so separate. probs want a init separate from the constructor.
     this->placeGameButtons(height, width);
     game.setUp(height, width, numMines);
 
@@ -52,6 +51,35 @@ void MainWindow::loadGameIcons(){
     }
 }
 
+QMineButton* MainWindow::makeButton(QSize buttonSize, int row, int col) {
+    QMineButton* gridButton = new QMineButton(row, col, ui->wGameGrid);
+
+    //icon colour RGBs are 37 52 84 dec or 25 34 54 hex
+    gridButton->setIcon(QIcon(gameIcons[10]));
+    gridButton->setIconSize(buttonSize);
+    gridButton->setMaximumSize(buttonSize);
+    gridButton->setMinimumSize(buttonSize);
+
+    connect(gridButton, &QMineButton::rightPressed,
+            this, &MainWindow::onMineRightPressed);
+
+
+    connect(gridButton, &QMineButton::leftPressed,
+            this, &MainWindow::onMineLeftPressed);
+
+    return gridButton;
+}
+
+void MainWindow::setUpWindowSize(QSize buttonSize) {
+    //grid size in pixels is fixed by the number of tiles and the size of a tile.
+    //this is done to get rid of spaces between buttons - I didn't figure out how to set the padding/margins to 0.
+    QSize gridSize(buttonSize.width() * gridWidth, buttonSize.height() * gridHeight);
+    ui->wGameGrid->setMaximumSize(gridSize);
+    ui->wGameGrid->setMinimumSize(gridSize);
+    //window size is also fixed.
+    QSize windowSize(gridSize.width() * 1.05, gridSize.height() * 1.35);
+    this->setFixedSize(windowSize);
+}
 
 void MainWindow::placeGameButtons(int height, int width) {
     QWidget* gg = ui->wGameGrid;
@@ -65,36 +93,18 @@ void MainWindow::placeGameButtons(int height, int width) {
         row = QVector<QMineButton*>(width);
     }
 
-    QSize buttSize(64, 64);
+    QSize buttonSize(64, 64);
 
     //set grid size to get rid of spaces between buttons
-    QSize gridSize(buttSize.width() * gridWidth, buttSize.height() * gridHeight);
-    ui->wGameGrid->setMaximumSize(gridSize);
-    ui->wGameGrid->setMinimumSize(gridSize);
-    QSize windowSize(gridSize.width() * 1.05, gridSize.height() * 1.35);
-    this->setFixedSize(windowSize);
+    setUpWindowSize(buttonSize);
 
     //create all the buttons
     for (int row = 0; row < height; ++row) {
         for (int col =0; col < width; ++col) {
-            QMineButton* gridButton = new QMineButton(row, col, gg);
+            QMineButton* gridButton = makeButton(buttonSize, row, col);
 
             gridVector[row][col] = gridButton;
-            //icon colour RGBs are 37 52 84 dec or 25 34 54 hex
-            gridButton->setIcon(QIcon(gameIcons[10]));
-            gridButton->setIconSize(buttSize);
-            gridButton->setMaximumSize(buttSize);
-            gridButton->setMinimumSize(buttSize);
-
             ggl->addWidget(gridButton, row, col);
-
-            connect(gridButton, &QMineButton::rightPressed,
-                    this, &MainWindow::onMineRightPressed);
-
-
-            connect(gridButton, &QMineButton::leftPressed,
-                    this, &MainWindow::onMineLeftPressed);
-
             gridButton->show();
         }
     }
