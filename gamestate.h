@@ -35,6 +35,7 @@ private:
     void placeMines(int height, int width, int numMines);
     char countNeighbours(int row, int col);
     void openSurrounding(int row, int col);
+    bool setFlagMarked(int row, int col, bool flagVal);
 
 signals:
     void tileRevealed(int grid_row, int grid_col, char value);

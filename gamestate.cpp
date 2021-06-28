@@ -73,6 +73,7 @@ void GameState::openSurrounding(int row, int col) {
             if (coli < 0 || coli >= width) continue;
             if (coli == col && rowi == row) continue; //skip the centre tile
 
+            setFlagMarked(rowi, coli, false); //this is to ensure flags don't get left behing if opening a 0-area.
             openTile(rowi, coli);
         }
     }
@@ -82,6 +83,8 @@ void GameState::openTile(int row, int col) {
     Tile& tile = gameGrid[row][col]; //do NOT use .at() here if using QVectors. That fn returns a const value and cannot be stored as a reference, unlike with STL .at().
     if (tile.opened)
         return; //do not open again once opened
+    if (tile.flagMarked)
+        return; //do not allow opening a marked tile (unless it is a 0-area opening -- handled in openSurrounding.)
 
     //increment numOpened
     ++numOpened;
@@ -111,14 +114,20 @@ void GameState::openTile(int row, int col) {
     }
 }
 
-bool GameState::toggleFlag(int row, int col) {
+bool GameState::setFlagMarked(int row, int col, bool flagVal) {
     Tile& tile = gameGrid[row][col];
     if (tile.opened)
         return false; //do not allow flagging opened tiles.
 
-    tile.flagMarked = !tile.flagMarked;
+    tile.flagMarked = flagVal;
+
     emit flagToggled(row, col, tile.flagMarked);
     return tile.flagMarked;
+}
+
+bool GameState::toggleFlag(int row, int col) {
+    Tile& tile = gameGrid[row][col];
+    return setFlagMarked(row, col, !tile.flagMarked);
 }
 
 //maybe have this as a game state enum instead? (won, lost, in_progress)
