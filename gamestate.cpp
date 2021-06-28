@@ -6,50 +6,46 @@
 
 //should probs move this into the constructor
 void GameState::setUp(int height, int width, long numMines){
+    //set up grid
     gameGrid = QVector<QVector<Tile>>(height);
-//    gameGrid = std::vector<std::vector<Tile>>(height);
     for (auto& row : gameGrid){
         row = QVector<Tile>(width);
-//        row = std::vector<Tile>(width);
-        for (auto& tile: row) {
-            tile.containsMine = false;
-            tile.flagMarked = false;
-            tile.opened = false;
-        }
     }
-//    openedGrid = std::vector<std::vector<bool>>(height);
-//    for (auto& row : openedGrid){
-//        row = std::vector<bool>(width, false);
-//    }
 
     numOpened = 0;
     this->width = width;
     this->height = height;
     this->numMines = numMines;
 
-    //placing mines
-    {
-        //these will be the indices of the mines on a flattened grid
-        std::vector<unsigned int> indices;
+    //place mines
+    placeMines();
+}
 
-        //like python range. Not efficient but doesn't matter
-        std::vector<unsigned int> range(width * height);
-        std::iota(range.begin(), range.end(), 0);
+void GameState::placeMines() {
+    placeMines(this->height, this->width, this->numMines);
+}
 
-        //random sample from range
-        std::sample(range.begin(), range.end(), std::back_inserter(indices), numMines,
-                    std::mt19937{std::random_device{}()});
+void GameState::placeMines(int height, int width, int numMines) {
+    //these will be the indices of the mines on a flattened grid
+    std::vector<unsigned int> indices;
 
-        //uncomment to place all mines in the first n tiles, for testing
-//        std::iota(indices.begin(), indices.end(), 0);
+    //like python range. Maybe not efficient but doesn't matter
+    std::vector<unsigned int> range(width * height);
+    std::iota(range.begin(), range.end(), 0);
 
-        //converting from flat indices to placed mines on the game grid.
-        for (const unsigned int& i: indices) {
-            int row = i / width;
-            int col = i % width;
+    //random sample from range
+    std::sample(range.begin(), range.end(), std::back_inserter(indices), numMines,
+                std::mt19937{std::random_device{}()});
 
-            gameGrid[row][col].containsMine = true;
-        }
+    // uncomment to place all mines in the first n tiles, for testing
+    //std::iota(indices.begin(), indices.end(), 0);
+
+    //converting from flat indices to placed mines on the game grid.
+    for (const unsigned int& i: indices) {
+        int row = i / width;
+        int col = i % width;
+
+        gameGrid[row][col].containsMine = true;
     }
 }
 

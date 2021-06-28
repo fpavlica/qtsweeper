@@ -26,16 +26,13 @@ public:
     bool toggleFlag(int row, int col); //returns true if newly flagged, false if newly unflagged
 
 private:
-//    std::vector<std::vector<bool>> mineGrid;
-//    std::vector<std::vector<bool>> openedGrid;
-
-//    std::vector<std::vector<Tile>> gameGrid;
     QVector<QVector<Tile>> gameGrid;
-//    void placeMines(unsigned int height, unsigned int width, unsigned int numMines);
-    long numOpened, numMines;
+    long numOpened = 0, numMines = 0;
 
-    int width, height;
+    int width = 0, height = 0;
 
+    void placeMines(); //uses pre-set values
+    void placeMines(int height, int width, int numMines);
     char countNeighbours(int row, int col);
     void openSurrounding(int row, int col);
 
