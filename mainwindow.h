@@ -20,6 +20,8 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    QMineButton* makeButton(QSize buttonSize, int row, int col);
+    void setUpWindowSize(QSize buttonSize);
     void placeGameButtons(int height = 10, int width = 8);
     void clearGameButtons();
     QVector<QVector<QMineButton*>> gridVector;
@@ -30,13 +32,15 @@ private:
     QVector<QPixmap> gameIcons;
     void loadGameIcons();
 
-    void openTile(QMineButton *mb);
-    void openAdjacentTiles(QMineButton* centre);
-
 private slots:
     void onMineRightPressed();
     void onMineLeftPressed();
 
+    void onTileRevealed(int grid_row, int grid_col, int val);
+    void onGameFinished(bool win);
+    void onFlagToggled(int grid_row, int grid_col, bool newState);
+
     void onRestartClicked();
+
 };
 #endif // MAINWINDOW_H
