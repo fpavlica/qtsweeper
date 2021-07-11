@@ -10,6 +10,8 @@ A basic playable minesweeper game on an 8x10 grid with 10 mines hidden.
 The game is designed to have a cool dark blue colour scheme to make it look somewhat different from the original game. 
 All icons were made by myself.
 
+<img src="minesweeper_screenshot.png?raw=True" height="600" alt-text="A screenshot of the game">
+
 ## Missing features
 
 This game is clearly not very polished, and it is not meant to be – 
